@@ -1,71 +1,68 @@
-# NLP Disaster Tweet Classification
+# 🧠 NLP Disaster Tweet Classification with DistilBERT
 
-This project is focused on predicting whether a tweet is related to a disaster using Natural Language Processing (NLP) techniques. The model is fine-tuned on BERT (Bidirectional Encoder Representations from Transformers) for sequence classification to classify tweets into disaster-related or non-disaster categories. The project includes data preprocessing, model fine-tuning, and generating predictions for a Kaggle competition.
+This project focuses on predicting whether a tweet is related to a disaster using Natural Language Processing (NLP) techniques. A pretrained **DistilBERT** model is fine-tuned for binary sequence classification to label tweets as disaster-related or not. This project was submitted to a Kaggle competition.
 
-## Project Overview
+---
 
-The main components of this project include:
-- **Tweet Length and Word Count Distribution Analysis**: Initial exploratory data analysis (EDA) was performed to understand the distribution of tweet lengths and word counts in the dataset.
-- **Model Fine-Tuning**: A pre-trained BERT model (`bert-base-uncased`) was fine-tuned on the provided disaster tweet dataset.
-- **Prediction and Submission**: The fine-tuned model was used to make predictions on the test dataset, and results were submitted to a Kaggle competition.
+## 🚀 Project Overview
 
-## Key Steps
+- 🔍 **EDA & Preprocessing**: Cleaned tweets, removed URLs and special characters, and tokenized input using Hugging Face’s tokenizer.
+- 🧪 **Model Training**: Fine-tuned a `distilbert-base-uncased` model on the training set using the Hugging Face Transformers library and PyTorch.
+- 📊 **Evaluation**: Assessed performance on a validation set using **F1 score** (Kaggle’s official metric).
+- 💾 **Model Saving**: Automatically saved the best model based on validation F1 score.
+- 📉 **Early Stopping**: Prevented overfitting by monitoring validation performance and stopping when no further improvement was seen.
 
-1. **Data Preprocessing**: 
-   - Cleaned and preprocessed the raw tweet data, including the removal of URLs.
+---
 
-2. **Exploratory Data Analysis (EDA)**:
-   - Analyzed tweet lengths and word counts to understand the distribution of text data.
-   - Visualizations provided insight into the range and frequency of tweet lengths.
+## 🛠️ Key Steps
 
-3. **Model Training**:
-   - Fine-tuned a BERT model using the preprocessed training data.
-   - Used AdamW optimizer with learning rate scheduling and warmup steps to improve training efficiency.
-   - Evaluated model performance after each epoch using test accuracy.
+### 1. Data Preprocessing
+- Removed mentions, URLs, HTML tags, and redundant white spaces.
+- Lowercased text and tokenized using `AutoTokenizer`.
+- Converted encoded text and labels into PyTorch datasets and loaders.
 
-4. **Prediction and Submission**:
-   - Used the fine-tuned model to generate predictions on the test dataset.
-   - Prepared a submission file for the Kaggle competition.
-## Training Results
+### 2. Model Training and Evaluation
+- Fine-tuned `distilbert-base-uncased` with:
+  - `AdamW` optimizer
+  - Linear learning rate scheduler
+  - Batch size of 16
+  - 2-epoch early stopping based on **validation F1**
 
-The model was trained for 5 epochs with the following results:
+---
 
-- **Epoch 1/5**:
-  - **Train Loss**: 0.5012
-  - **Test Accuracy**: 84.11%
-  
-- **Epoch 2/5**:
-  - **Train Loss**: 0.3663
-  - **Test Accuracy**: 84.83%
-  
-- **Epoch 3/5**:
-  - **Train Loss**: 0.3114
-  - **Test Accuracy**: 83.26%
-  
-- **Epoch 4/5**:
-  - **Train Loss**: 0.2515
-  - **Test Accuracy**: 81.16%
-  
-- **Epoch 5/5**:
-  - **Train Loss**: 0.1967
-  - **Test Accuracy**: 82.93%
+## 📈 Training Results
 
-### Analysis
+| Epoch | Train Loss | Train Acc | Train F1 | Val Acc | Val F1 | Notes |
+|-------|------------|-----------|----------|---------|--------|-------|
+| 1     | 0.4430     | 0.8121    | 0.7581   | 0.8163  | 0.7929 | ✅ Best model saved |
+| 2     | 0.3494     | 0.8587    | 0.8240   | 0.8176  | 0.7583 | ⚠️ No improvement |
+| 3     | 0.2966     | 0.8851    | 0.8568   | 0.8255  | 0.7879 | ⚠️ No improvement — Early stop |
 
-- **Training Loss**: The training loss decreased consistently from 0.5012 in the first epoch to 0.1967 in the fifth epoch, indicating that the model was learning and improving its performance on the training data.
-  
-- **Test Accuracy**: The test accuracy initially increased from 84.11% in the first epoch to a peak of 84.83% in the second epoch. However, it then decreased to 81.16% by the fourth epoch and slightly improved to 82.93% in the final epoch.
+### 🔎 Observations
 
-### Observations
+- The model reached **its best validation F1 score of 0.7929** during the **first epoch**.
+- While training F1 and accuracy improved in later epochs, **validation performance plateaued**, suggesting **mild overfitting**.
+- **Early stopping** prevented unnecessary training and saved the best-performing model.
 
-- The model achieved its highest test accuracy of 84.83% during the second epoch. Despite this peak, the test accuracy exhibited fluctuations in subsequent epochs.
-- The decreasing trend in test accuracy in later epochs may suggest potential overfitting or instability in the model’s performance on the test data.
+---
 
-### Next Steps
+## ✅ Key Features
 
-- **Hyperparameter Tuning**: Experiment with different hyperparameters, such as learning rates and batch sizes, to stabilize and improve model performance.
-- **Regularization Techniques**: Implement regularization methods to mitigate overfitting and enhance model generalization.
-- **Further Epochs**: Consider training for additional epochs or applying early stopping based on validation performance to better capture the optimal model state.
+- Transformer-based fine-tuning using **DistilBERT**
+- **Evaluation-driven model checkpointing**
+- **F1 score** optimization (aligned with Kaggle scoring)
+- Training tracked with **progress bars (tqdm)** for clean logging
+
+---
+
+## 🧠 Next Steps
+
+- 🔧 **Tune hyperparameters**: learning rate, batch size, weight decay
+- 🧼 **Use additional features**: like `location`
+- 🧪 **Try other models**: like RoBERTa, or even logistic regression for comparison
+- 📦 **Deploy with Streamlit**: build an interactive demo using the trained model
+
+---
 
 ## Important Notice
 
