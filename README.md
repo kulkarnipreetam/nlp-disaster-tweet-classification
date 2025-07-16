@@ -1,66 +1,82 @@
-# 🧠 NLP Disaster Tweet Classification with DistilBERT
+# 🧠 Disaster Tweet Classification – ML & NLP Comparison + Streamlit Deployment
 
-This project focuses on predicting whether a tweet is related to a disaster using Natural Language Processing (NLP) techniques. A pretrained **DistilBERT** model is fine-tuned for binary sequence classification to label tweets as disaster-related or not. This project was submitted to a Kaggle competition.
-
----
-
-## 🚀 Project Overview
-
-- 🔍 **EDA & Preprocessing**: Cleaned tweets, removed URLs and special characters, and tokenized input using Hugging Face’s tokenizer.
-- 🧪 **Model Training**: Fine-tuned a `distilbert-base-uncased` model on the training set using the Hugging Face Transformers library and PyTorch.
-- 📊 **Evaluation**: Assessed performance on a validation set using **F1 score** (Kaggle’s official metric).
-- 💾 **Model Saving**: Automatically saved the best model based on validation F1 score.
-- 📉 **Early Stopping**: Prevented overfitting by monitoring validation performance and stopping when no further improvement was seen.
+This project classifies tweets as disaster-related or not using both **traditional ML models** and a **fine-tuned DistilBERT transformer model**. It was originally developed for the [Kaggle NLP Disaster Tweets Competition](https://www.kaggle.com/competitions/nlp-getting-started) and includes a deployed **Streamlit app** for real-time prediction.
 
 ---
 
-## 🛠️ Key Steps
+## 🚀 Project Highlights
 
-### 1. Data Preprocessing
-- Removed mentions, URLs, HTML tags, and redundant white spaces.
-- Lowercased text and tokenized using `AutoTokenizer`.
-- Converted encoded text and labels into PyTorch datasets and loaders.
+- ✅ Built and evaluated **3 models**: Naive Bayes, Logistic Regression, and DistilBERT
+- 🧪 Preprocessed tweet data using regex cleaning and keyword merging
+- 📊 Compared performance across models (F1 score was the main metric)
+- 🖥️ Deployed the final classifier using **Streamlit** for interactive use
+- 🥇 **DistilBERT performed best** on the validation set and Kaggle leaderboard
 
-### 2. Model Training and Evaluation
-- Fine-tuned `distilbert-base-uncased` with:
+---
+
+## 📦 Models Compared
+
+| Model              | Validation F1 | Kaggle Score | Notes                          |
+|-------------------|---------------|--------------|--------------------------------|
+| Naive Bayes        | ~0.78         | ~0.79        | Simple, fast baseline model using TF-IDF; performs reasonably well.           |
+| Logistic Regression| ~0.78         | ~0.79        | Slightly more stable than NB; comparable performance with better calibration.        |
+| DistilBERT         | **0.79+**     | **0.83**| Fine-tuned transformer; outperformed both baselines on validation and leaderboard.   |
+
+---
+
+## 🧹 Preprocessing
+
+- Removed:
+  - User mentions (`@user`)
+  - URLs and HTML tags
+  - Special characters and extra whitespace
+- Lowercased text
+- Merged `keyword` and `text` fields during training
+
+---
+
+## 🧠 DistilBERT Fine-Tuning
+
+- Base model: `distilbert-base-uncased`
+- Trained using:
   - `AdamW` optimizer
-  - Linear learning rate scheduler
-  - Batch size of 16
-  - 2-epoch early stopping based on **validation F1**
+  - Learning rate scheduler
+  - Early stopping (based on validation F1)
+- Used Hugging Face `transformers` + PyTorch
+- Best validation F1: **0.7929**
 
 ---
 
-## 📈 Training Results
+## 🌐 Live Demo – Streamlit App
 
-| Epoch | Train Loss | Train Acc | Train F1 | Val Acc | Val F1 | Notes |
-|-------|------------|-----------|----------|---------|--------|-------|
-| 1     | 0.4430     | 0.8121    | 0.7581   | 0.8163  | 0.7929 | ✅ Best model saved |
-| 2     | 0.3494     | 0.8587    | 0.8240   | 0.8176  | 0.7583 | ⚠️ No improvement |
-| 3     | 0.2966     | 0.8851    | 0.8568   | 0.8255  | 0.7879 | ⚠️ No improvement — Early stop |
+Try out the classifier in your browser:  
+👉 **[Disaster Tweet Classifier (Streamlit App)](https://disastertweetclassifier.streamlit.app/)**
 
-### 🔎 Observations
+> Choose a model (Naive Bayes or Logistic Regression), enter a tweet, and classify it in real time.
 
-- The model reached **its best validation F1 score of 0.7929** during the **first epoch**.
-- While training F1 and accuracy improved in later epochs, **validation performance plateaued**, suggesting **mild overfitting**.
-- **Early stopping** prevented unnecessary training and saved the best-performing model.
+### 🔧 Models in the App:
+- ✅ Naive Bayes
+- ✅ Logistic Regression
+- 🚧 (DistilBERT not yet deployed in app due to size — coming soon!)
 
 ---
 
-## ✅ Key Features
+## 🧪 Next Steps
 
-- Transformer-based fine-tuning using **DistilBERT**
-- **Evaluation-driven model checkpointing**
-- **F1 score** optimization (aligned with Kaggle scoring)
-- Training tracked with **progress bars (tqdm)** for clean logging
+- 🔧 Add support for DistilBERT in the Streamlit app
+- 📈 Display model metrics (F1, ROC AUC) in app sidebar
+- 🧹 Improve text preprocessing pipeline using `nltk` or `spacy`
+- 🔄 Add additional features like `location` or tweet metadata
 
 ---
 
-## 🧠 Next Steps
+## 📚 Tools & Libraries
 
-- 🔧 **Tune hyperparameters**: learning rate, batch size, weight decay
-- 🧼 **Use additional features**: like `location`
-- 🧪 **Try other models**: like RoBERTa, or even logistic regression for comparison
-- 📦 **Deploy with Streamlit**: build an interactive demo using the trained model
+- **Streamlit** for UI deployment
+- **scikit-learn** for traditional ML models
+- **Hugging Face Transformers** for DistilBERT
+- **PyTorch** for fine-tuning
+- **Pandas**, **Joblib**, **TQDM**, **Regex** for preprocessing and utilities
 
 ---
 
