@@ -57,16 +57,16 @@ Try out the classifier in your browser:
 ### 🔧 Models in the App:
 - ✅ Naive Bayes
 - ✅ Logistic Regression
-- 🚧 (DistilBERT not yet deployed in app due to size — coming soon!)
+- ✅ DistilBERT
 
 ---
 
 ## 🧪 Next Steps
 
-- 🔧 Add support for DistilBERT in the Streamlit app
 - 📈 Display model metrics (F1, ROC AUC) in app sidebar
 - 🧹 Improve text preprocessing pipeline using `nltk` or `spacy`
 - 🔄 Add additional features like `location` or tweet metadata
+- 🚀 Optimize DistilBERT loading time with quantization or other model compression techniques
 
 ---
 
