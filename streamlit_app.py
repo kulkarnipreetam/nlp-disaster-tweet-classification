@@ -43,7 +43,7 @@ def load_logreg_model():
 # === Load distilbert ===
 @st.cache_resource
 def load_distilbert_model():
-    model_path = "./distilbert_model"  # Update this path as needed
+    model_path = "preetamkulkarni/distilbert_disaster_tweet"  # Update this path as needed
     model = DistilBertForSequenceClassification.from_pretrained(model_path)
     model.eval()
     tokenizer = DistilBertTokenizerFast.from_pretrained(model_path)
