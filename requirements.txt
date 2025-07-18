@@ -1,6 +1,6 @@
-streamlit>=1.30.0
+streamlit==1.46.1
 scikit-learn==1.6.1
-joblib>=1.2.0
-transformers>=4.36.0
-torch>=2.1.0
-tokenizers>=0.19.1
+joblib==1.4.2
+transformers==4.37.2
+torch==2.2.2
+tokenizers==0.15.2
