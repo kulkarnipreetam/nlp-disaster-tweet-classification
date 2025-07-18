@@ -45,9 +45,9 @@ def load_logreg_model():
 def load_distilbert_model():
     model_path = "preetamkulkarni/distilbert_disaster_tweet"  # Update this path as needed
     hf_token = st.secrets["HUGGINGFACE_TOKEN"]
-    model = DistilBertForSequenceClassification.from_pretrained(model_path)
+    model = DistilBertForSequenceClassification.from_pretrained(model_path, use_auth_token=hf_token)
     model.eval()
-    tokenizer = DistilBertTokenizerFast.from_pretrained(model_path)
+    tokenizer = DistilBertTokenizerFast.from_pretrained(model_path, use_auth_token=hf_token)
     return model, tokenizer
 
 # === Predict ===
