@@ -18,7 +18,7 @@ This project classifies tweets as disaster-related or not using both **tradition
 
 | Model              | Validation F1 | Kaggle Score | Notes                          |
 |-------------------|---------------|--------------|--------------------------------|
-| Naive Bayes        | ~0.78         | ~0.79        | Simple, fast baseline model using TF-IDF; performs reasonably well.           |
+| Naive Bayes        | ~0.79         | ~0.79        | Simple, fast baseline model using CountVectorizer; performs reasonably well.           |
 | Logistic Regression| ~0.78         | ~0.79        | Slightly more stable than NB; comparable performance with better calibration.        |
 | DistilBERT         | **0.79+**     | **0.83**| Fine-tuned transformer; outperformed both baselines on validation and leaderboard.   |
 
