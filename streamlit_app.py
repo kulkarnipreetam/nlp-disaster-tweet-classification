@@ -3,8 +3,13 @@ import joblib
 import os
 import re
 import torch
+import warnings
 
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
+
+# Suppress known FutureWarnings from huggingface and transformers
+warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub")
+warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
 
 # App title
 st.set_page_config(page_title="Disaster Tweet Classifier")
@@ -45,9 +50,9 @@ def load_logreg_model():
 def load_distilbert_model():
     model_path = "preetamkulkarni/distilbert_disaster_tweet"  # Update this path as needed
     hf_token = st.secrets["HUGGINGFACE_TOKEN"]
-    model = DistilBertForSequenceClassification.from_pretrained(model_path, use_auth_token=hf_token)
+    model = DistilBertForSequenceClassification.from_pretrained(model_path, token=hf_token)
     model.eval()
-    tokenizer = DistilBertTokenizerFast.from_pretrained(model_path, use_auth_token=hf_token)
+    tokenizer = DistilBertTokenizerFast.from_pretrained(model_path, token=hf_token)
     return model, tokenizer
 
 # === Predict ===
