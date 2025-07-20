@@ -1,4 +1,6 @@
 import streamlit as st
+import plotly.graph_objects as go
+import pandas as pd
 import joblib
 import os
 import re
@@ -10,6 +12,17 @@ from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassific
 # Suppress known FutureWarnings from huggingface and transformers
 warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub")
 warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
+
+with st.sidebar:
+    st.header("📈 Visualization Settings")
+
+    all_metrics = ["ROC Curve", "Precision-Recall", "Reliability Curve", "F1 vs Threshold"]
+
+    # Display toggles and collect selected metrics
+    selected_metrics = []
+    for metric in all_metrics:
+        if st.toggle(label=metric, key=f"toggle_{metric}"):
+            selected_metrics.append(metric)
 
 # App title
 st.set_page_config(page_title="Disaster Tweet Classifier")
@@ -89,3 +102,172 @@ if st.button("Classify"):
         label = "🔥 Real Disaster" if pred == 1 else "💬 Not a Disaster"
         st.success(f"**Prediction:** {label}")
         st.info(f"**Model:** {model_choice} | **Confidence:** {confidence:.2f}")
+        
+@st.cache_data
+def load_metrics():
+    models = ["nb", "lr", "distilbert"]
+    data = {}
+    for model in models:
+        df = pd.read_csv(f"utils/{model}_metrics.csv")
+        data[model] = df
+    return data
+
+metrics_data = load_metrics()
+
+model_names = {"nb": "Naive Bayes", "lr": "Logistic Regression", "distilbert": "DistilBERT"}
+colors = {"nb": "#1f77b4", "lr": "#2ca02c", "distilbert": "#d62728"} 
+
+def plot_roc_plotly(metrics_data, model_names, colors):
+    fig = go.Figure()
+    for model_key, df in metrics_data.items():
+        fig.add_trace(go.Scatter(
+            x=df["fpr"],
+            y=df["tpr"],
+            mode="lines",
+            name=f"{model_names[model_key]} (AUC = {df['roc_auc'][0]:.2f})",
+            line=dict(color=colors[model_key]),
+            hovertemplate = ('<span style="color:{color};">{name}</span><br>' 
+                             'FPR: %{{x:.3f}}<br>TPR: %{{y:.3f}}<extra></extra>').format(color=colors[model_key], name=model_names[model_key])
+        ))
+    fig.add_trace(go.Scatter(
+        x=[0, 1],
+        y=[0, 1],
+        mode="lines",
+        line=dict(color="black", dash="dash"),
+        showlegend=False
+    ))
+    fig.update_layout(
+        title="ROC Curve",
+        xaxis_title="False Positive Rate (1 - Specificity)",
+        yaxis_title="True Positive Rate (Sensitivity)",
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,
+            xanchor="center",
+            x=0.5,
+            bgcolor='rgba(0,0,0,0)',
+            font=dict(size=12)
+        ),
+        margin=dict(t=50, b=80),
+        template="plotly_white"
+    )
+    return fig
+
+def plot_pr_plotly(metrics_data, model_names, colors):
+    fig = go.Figure()
+    for model_key, df in metrics_data.items():
+        fig.add_trace(go.Scatter(
+            x=df["recall"],
+            y=df["precision"],
+            mode="lines",
+            name=model_names[model_key],
+            line=dict(color=colors[model_key]),
+            hovertemplate = ('<span style="color:{color};">{name}</span><br>' 
+                             'Recall: %{{x:.3f}}<br>Precision: %{{y:.3f}}<extra></extra>').format(color=colors[model_key], name=model_names[model_key])
+        ))
+    fig.update_layout(
+        title="Precision-Recall Curve",
+        xaxis_title="Recall",
+        yaxis_title="Precision",
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,
+            xanchor="center",
+            x=0.5,
+            bgcolor='rgba(0,0,0,0)',
+            font=dict(size=12)
+        ),
+        margin=dict(t=50, b=80),
+        template="plotly_white"
+    )
+    return fig
+
+def plot_reliability_plotly(metrics_data, model_names, colors):
+    fig = go.Figure()
+    for model_key, df in metrics_data.items():
+        fig.add_trace(go.Scatter(
+            x=df["bin_center"],
+            y=df["true_rate"],
+            mode="lines+markers",
+            name=f"{model_names[model_key]} (Brier = {df['brier_score'][0]:.3f})",
+            line=dict(color=colors[model_key]),
+            marker=dict(symbol="circle", size=8),
+            hovertemplate = ('<span style="color:{color};">{name}</span><br>' 
+                             'Predicted Prob: %{{x:.3f}}<br>True Rate: %{{y:.3f}}<extra></extra>').format(color=colors[model_key], name=model_names[model_key])
+        ))
+    fig.add_trace(go.Scatter(
+        x=[0, 1],
+        y=[0, 1],
+        mode="lines",
+        line=dict(color="black", dash="dash"),
+        showlegend=False
+    ))
+    fig.update_layout(
+        title="Reliability Curve",
+        xaxis_title="Predicted Probability",
+        yaxis_title="Empirical True Rate",
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,
+            xanchor="center",
+            x=0.5,
+            bgcolor='rgba(0,0,0,0)',
+            font=dict(size=12)
+        ),
+        margin=dict(t=50, b=80),
+        template="plotly_white"
+    )
+    return fig
+
+def plot_f1_plotly(metrics_data, model_names, colors):
+    fig = go.Figure()
+    for model_key, df in metrics_data.items():
+        fig.add_trace(go.Scatter(
+            x=df["pr_thresholds"],
+            y=df["f1_score"],
+            mode="lines",
+            name= model_names[model_key],
+            line=dict(color=colors[model_key]),
+            hovertemplate = ('<span style="color:{color};">{name}</span><br>' 
+                             'Threshold: %{{x:.2f}}<br>F1 Score: %{{y:.2f}}<extra></extra>').format(color=colors[model_key], name=model_names[model_key])
+        ))
+
+    fig.update_layout(
+        title="F1 score vs. Threshold",
+        xaxis_title="Threshold",
+        yaxis_title="F1 Score",
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,
+            xanchor="center",
+            x=0.5,
+            bgcolor='rgba(0,0,0,0)',
+            font=dict(size=12)
+        ),
+        margin=dict(t=50, b=80),
+        template="plotly_white"
+    )
+    return fig
+
+st.markdown("## 📐 Model Performance Visualizations")
+
+
+if "ROC Curve" in selected_metrics:
+    roc_fig = plot_roc_plotly(metrics_data, model_names, colors)
+    st.plotly_chart(roc_fig, use_container_width=True, height = 500)
+
+if "Precision-Recall" in selected_metrics:
+    pr_fig = plot_pr_plotly(metrics_data, model_names, colors)
+    st.plotly_chart(pr_fig, use_container_width=True, height = 500)
+
+if "Reliability Curve" in selected_metrics:
+    rel_fig = plot_reliability_plotly(metrics_data, model_names, colors)
+    st.plotly_chart(rel_fig, use_container_width=True, height = 500)
+    
+if "F1 vs Threshold" in selected_metrics:
+    rel_fig = plot_f1_plotly(metrics_data, model_names, colors)
+    st.plotly_chart(rel_fig, use_container_width=True, height = 500)
