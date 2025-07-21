@@ -16,11 +16,25 @@ This project classifies tweets as disaster-related or not using both **tradition
 
 ## 📦 Models Compared
 
-| Model              | Validation F1 | Kaggle Score | Notes                          |
-|-------------------|---------------|--------------|--------------------------------|
-| Naive Bayes        | ~0.79         | ~0.79        | Simple, fast baseline model using CountVectorizer; performs reasonably well.           |
-| Logistic Regression| ~0.78         | ~0.79        | Slightly more stable than NB; comparable performance with better calibration.        |
-| DistilBERT         | **0.79+**     | **0.83**| Fine-tuned transformer; outperformed both baselines on validation and leaderboard.   |
+| Model              | Validation F1 | Kaggle Score | Notes |
+|-------------------|---------------|--------------|-------|
+| **Naive Bayes**        | ~0.79         | ~0.79        | Simple, fast baseline using CountVectorizer. Surprisingly well-calibrated (Brier: 0.128) with high AUC (0.90), indicating strong discrimination and decent probability estimates. |
+| **Logistic Regression**| ~0.78         | ~0.79        | Linear baseline with similar classification performance. Slightly lower AUC (0.89) and worse calibration (Brier: 0.141), highlighting that theoretical expectations don’t always match real-world behavior. |
+| **DistilBERT**         | **0.79+**     | **0.83**     | Fine-tuned transformer model that outperforms both baselines in terms of classification (F1, AUC: 0.90) and probability calibration (Brier: 0.108). More robust and generalizable on unseen data. |
+
+> **📝 Calibration Insight:**  
+> While Logistic Regression is typically assumed to offer better-calibrated probabilities than Naive Bayes, this dataset showed the opposite: Naive Bayes achieved a lower Brier score (0.128 vs. 0.141), suggesting more reliable probability estimates in this specific case.  
+> DistilBERT, despite being more complex, provided both the best classification performance and the best-calibrated predictions — with the lowest Brier score (0.108). This reinforces the importance of **measuring calibration empirically**, especially when using model probabilities for downstream decisions.
+
+---
+
+### 💡 What can be discussed:
+
+- **Trade-off between simplicity and performance**: NB and LR are lightweight and easy to train; DistilBERT is heavier but significantly better.
+- **Discrimination vs. calibration**: AUC shows how well a model separates classes; Brier score shows how accurate its predicted probabilities are.
+- **Model reliability**: Even simple models like NB can outperform expectations on calibration — theory should guide, but data should decide.
+- **Real-world readiness**: If calibrated probabilities are needed (e.g., for risk thresholds or cost-sensitive applications), DistilBERT is the most reliable; NB may be a viable fallback if resources are constrained.
+
 
 ---
 
@@ -63,7 +77,6 @@ Try out the classifier in your browser:
 
 ## 🧪 Next Steps
 
-- 📈 Display model metrics (F1, ROC AUC) in app sidebar
 - 🧹 Improve text preprocessing pipeline using `nltk` or `spacy`
 - 🔄 Add additional features like `location` or tweet metadata
 - 🚀 Optimize DistilBERT loading time with quantization or other model compression techniques
