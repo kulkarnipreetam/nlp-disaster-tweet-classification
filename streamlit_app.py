@@ -18,10 +18,10 @@ for key in ["tweet_input", "model_choice", "prediction", "confidence", "label"]:
         st.session_state[key] = None
 
 with st.sidebar:
-    st.header("📈 Visualization Settings")
-    all_metrics = ["ROC Curve", "Precision-Recall", "Reliability Curve", "F1 vs Threshold"]
+    st.markdown("### 📈 Visualization Settings", unsafe_allow_html=True)
+    all_metrics = ["ROC Curve", "Precision-Recall", "Reliability Curve", "F1 vs. Threshold"]
 
-    selected_metric = st.radio("Select a visualization", all_metrics)
+    selected_metric = st.radio("Choose metric to display:", all_metrics)
 
 # App title
 st.set_page_config(page_title="Disaster Tweet Classifier", layout="wide")
@@ -279,6 +279,6 @@ with col2:
         rel_fig = plot_reliability_plotly(metrics_data, model_names, colors)
         st.plotly_chart(rel_fig, use_container_width=True, height = 500)
         
-    if selected_metric == "F1 vs Threshold":
+    if selected_metric == "F1 vs. Threshold":
         rel_fig = plot_f1_plotly(metrics_data, model_names, colors)
         st.plotly_chart(rel_fig, use_container_width=True, height = 500)
