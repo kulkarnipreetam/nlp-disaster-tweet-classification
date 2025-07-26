@@ -7,11 +7,15 @@ import re
 import torch
 import warnings
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-
 # Suppress known FutureWarnings from huggingface and transformers
 warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub")
 warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
+
+try:
+    from transformers import AutoTokenizer, AutoModelForSequenceClassification
+except ImportError:
+    AutoTokenizer = None
+    AutoModelForSequenceClassification = None
 
 for key in ["tweet_input", "model_choice", "prediction", "confidence", "label"]:
     if key not in st.session_state:
@@ -65,12 +69,20 @@ with col1:
     # === Load distilbert ===
     @st.cache_resource
     def load_distilbert_model():
+        if AutoTokenizer is None or AutoModelForSequenceClassification is None:
+            return None, None
+        
         model_path = "preetamkulkarni/distilbert_disaster_tweet"  # Update this path as needed
         hf_token = st.secrets["HUGGINGFACE_TOKEN"]
         model = AutoModelForSequenceClassification.from_pretrained(model_path, token=hf_token)
         model.eval()
         tokenizer = AutoTokenizer.from_pretrained(model_path, token=hf_token)
         return model, tokenizer
+
+    # Early check for model availability
+    if AutoTokenizer is None or AutoModelForSequenceClassification is None:
+        st.error("The app is still starting up (cold start). Please wait a few seconds and refresh the page.")
+        st.stop()
 
     # === Predict ===
     if st.button("Classify"):
