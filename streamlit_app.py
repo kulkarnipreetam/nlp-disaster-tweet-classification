@@ -36,9 +36,10 @@ col1, col2 = st.columns([1, 2], gap="medium")
 
 with col1:
     # Model selection
-    model_choice = st.selectbox("Choose a model:", ["Naive Bayes", "Logistic Regression", "DistilBERT"],
-                                index=["Naive Bayes", "Logistic Regression", "DistilBERT"].index(st.session_state.model_choice) if st.session_state.model_choice else 0)
-
+    model_choices = ["Naive Bayes", "Logistic Regression", "DistilBERT"]
+    if "model_option" not in st.session_state:
+        st.session_state.model_option = model_choices[0]
+    st.selectbox("Choose a model:", model_choices,key="model_choice")
 
     # Tweet input
     tweet = st.text_area("Enter tweet text:", value=st.session_state.tweet_input if st.session_state.tweet_input else "")
@@ -93,13 +94,13 @@ with col1:
             cleaned_tweet = clean_text(tweet)
 
             # Load model/vectorizer
-            if model_choice == "Naive Bayes":
+            if st.session_state.model_choice == "Naive Bayes":
                 model, vectorizer = load_naive_bayes_model()
                 X = vectorizer.transform([cleaned_tweet])
                 pred = model.predict(X)[0]
                 confidence = max(model.predict_proba(X)[0]) if hasattr(model, "predict_proba") else 1.0
 
-            elif model_choice == "Logistic Regression":
+            elif st.session_state.model_choice == "Logistic Regression":
                 model, vectorizer = load_logreg_model()
                 X = vectorizer.transform([cleaned_tweet])
                 pred = model.predict(X)[0]
@@ -119,7 +120,6 @@ with col1:
             
             # Store results in session state
             st.session_state.tweet_input = tweet
-            st.session_state.model_choice = model_choice
             st.session_state.prediction = pred
             st.session_state.confidence = confidence
             st.session_state.label = label
