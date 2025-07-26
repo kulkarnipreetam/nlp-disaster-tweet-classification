@@ -37,9 +37,15 @@ col1, col2 = st.columns([1, 2], gap="medium")
 with col1:
     # Model selection
     model_choices = ["Naive Bayes", "Logistic Regression", "DistilBERT"]
-    if "model_option" not in st.session_state:
-        st.session_state.model_option = model_choices[0]
-    st.selectbox("Choose a model:", model_choices,key="model_choice")
+    
+    if "model_choice" not in st.session_state or st.session_state.model_choice not in model_choices:
+        st.session_state.model_choice = model_choices[0]
+    
+    selected_model = st.selectbox("Choose a model:",
+                                  model_choices,
+                                  index=model_choices.index(st.session_state.model_choice))
+    
+    st.session_state.model_choice = selected_model
 
     # Tweet input
     tweet = st.text_area("Enter tweet text:", value=st.session_state.tweet_input if st.session_state.tweet_input else "")
