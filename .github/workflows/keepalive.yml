@@ -1,0 +1,33 @@
+name: Keep Streamlit App Awake
+
+on:
+  schedule:
+    # Runs at minute 0 every 9th hour: 00:00, 09:00, 18:00 UTC daily
+    - cron: "0 */9 * * *"
+  workflow_dispatch: {} 
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    environment: keep-alive
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+
+    env:
+      APP_URL: "https://disastertweetclassifier.streamlit.app/"
+
+    steps:
+      - name: Ping app (with built-in curl retry)
+        run: |
+          # --fail: make curl exit non-zero on HTTP errors
+          # --show-error: print errors
+          # --silent: reduce noise
+          # --retry/--retry-delay/--retry-all-errors: robust against transient failures
+          curl --fail --show-error --silent \
+               --retry 5 --retry-delay 10 --retry-all-errors \
+               -o /dev/null "$APP_URL"
+
+      - name: Log timestamp (UTC)
+        run: date -u
