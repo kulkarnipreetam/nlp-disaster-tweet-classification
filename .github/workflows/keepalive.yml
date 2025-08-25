@@ -9,7 +9,6 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
-    environment: keep-alive
     timeout-minutes: 5
 
     permissions:
